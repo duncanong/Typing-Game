@@ -1,2 +1,74 @@
-#Trial one
+#Trial One
 from tkinter import *
+import random
+
+
+master = Tk()
+a=150
+b=250
+
+def keydown(e):
+    global target
+    global word
+    global word_id
+    letter=e.char
+    word+=letter
+    if e.keysym=='BackSpace':
+        word=word[:-2]
+    w.itemconfig(word_id,text=word)
+
+def werd(e):
+    global target
+    global word
+    global word_id
+    move_x=random.randint(-100,100)
+    move_y=random.randint(-100,100)
+    if word==target:
+        w.itemconfig(word_id,text='Correct!')
+        gen_target()
+        w.itemconfig(target_id,text=target)
+        w.move(balloon,move_x,move_y)
+        w.move(target_id,move_x,move_y)
+    else:
+        w.itemconfig(word_id,text='Failure')
+    word=' '
+
+#def keyup(e):
+#    global a
+#    a-10
+
+#def on(master,event):
+#    insert=w.index(word_id,INSERT)
+#    if event.char>=' ':
+#       w.insert(word_id,'insert',event.char)
+
+
+word=' '
+test=Frame(master,width=400,height=20)
+w = Canvas(master, width=400, height=200)
+test.bind('<KeyPress>',keydown)
+test.bind('<Return>',werd)
+#test.bind('<Left>',keyup)
+test.pack()
+test.focus_set()
+w.pack()
+
+w.create_line(0, 0, 400, 200,fill ='#013220',dash=(30,10))
+w.create_line(0, 200, 400, 0, fill="#8b0000", dash=(30, 10))
+
+#w.create_rectangle(100, 50, 300, 150, fill="blue")
+balloon=w.create_oval(150,50,250,150,fill='#8b0000')
+def gen_target():
+    global target
+    target=' '
+    target+=chr(random.randint(65,90))
+    for i in range(5):
+        a=random.randint(97,122)
+        target+=chr(a)
+
+gen_target()
+target_id=w.create_text(200,100,text=target,fill='#008b00')
+word_id=w.create_text(200,b-75,text='Type the word in the bubble',fill='#000000')
+
+
+test.mainloop()
