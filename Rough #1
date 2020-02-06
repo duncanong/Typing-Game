@@ -1,74 +1,118 @@
 #Trial One
 from tkinter import *
 import random
-
+import time
 
 master = Tk()
-a=150
-b=250
+master.title('Balloon Pop')
 
-def keydown(e):
+
+            ### Functions
+class user:
+    def __init__(self,username,password):
+        self.username=username
+        self.password=password
+
+def type_log(e):
     global target
     global word
     global word_id
+    global start
+    global time_left
     letter=e.char
     word+=letter
-    if e.keysym=='BackSpace':
-        word=word[:-2]
-    w.itemconfig(word_id,text=word)
+    now=time.time()
+    time_left=int(60-((now-start)//1))
+    if now-start<60:
+        if e.keysym=='BackSpace':
+            word=word[:-2]
+        game_w.itemconfig(word_id,text=word)
+        game_w.itemconfig(time_id,text='Time left: '+str(time_left))
+    else:
+        game_w.destroy()
+        test.destroy()
+        show_results()
 
-def werd(e):
+def enter_word(e):
     global target
     global word
     global word_id
-    move_x=random.randint(-100,100)
-    move_y=random.randint(-100,100)
+    global target_id
+    global balloon
+    global score
+    global score_id
     if word==target:
-        w.itemconfig(word_id,text='Correct!')
+        game_w.itemconfig(word_id,text='Correct!')
         gen_target()
-        w.itemconfig(target_id,text=target)
-        w.move(balloon,move_x,move_y)
-        w.move(target_id,move_x,move_y)
-    else:
-        w.itemconfig(word_id,text='Failure')
-    word=' '
+        game_w.itemconfig(target_id, text=target)
+        game_w.delete(balloon)
+        game_w.delete(target_id)
+        score+=1
+        game_w.itemconfig(score_id,text='Score: '+str(score))
+        gen_balloon()
+        word=''
+#    else:
+#        game_w.itemconfig(word_id,text='Failure')
+        
+def test():
+    global target_id
+    print(target_id.x)
 
-#def keyup(e):
-#    global a
-#    a-10
-
-#def on(master,event):
-#    insert=w.index(word_id,INSERT)
-#    if event.char>=' ':
-#       w.insert(word_id,'insert',event.char)
-
-
-word=' '
-test=Frame(master,width=400,height=20)
-w = Canvas(master, width=400, height=200)
-test.bind('<KeyPress>',keydown)
-test.bind('<Return>',werd)
-#test.bind('<Left>',keyup)
-test.pack()
-test.focus_set()
-w.pack()
-
-w.create_line(0, 0, 400, 200,fill ='#013220',dash=(30,10))
-w.create_line(0, 200, 400, 0, fill="#8b0000", dash=(30, 10))
-
-#w.create_rectangle(100, 50, 300, 150, fill="blue")
-balloon=w.create_oval(150,50,250,150,fill='#8b0000')
+def gen_balloon():
+    global balloon
+    global target
+    global target_id
+    x1=random.randint(0,300)
+    y1=random.randint(0,180)
+    balloon=game_w.create_oval(x1,y1,x1+100,y1+100,fill='#8b0000')
+    target_id=game_w.create_text(x1+50,y1+50,text=target,fill='#008b00')
+    
 def gen_target():
     global target
-    target=' '
-    target+=chr(random.randint(65,90))
-    for i in range(5):
-        a=random.randint(97,122)
-        target+=chr(a)
+    global target_word_list
+    target=target_word_list[random.randint(0,3723)]
 
-gen_target()
-target_id=w.create_text(200,100,text=target,fill='#008b00')
-word_id=w.create_text(200,b-75,text='Type the word in the bubble',fill='#000000')
+def show_results():
+    global score
+    results_w=Canvas(master,width=200,height=200)
+    results_w.create_text(100,100,text='Your score is '+str(score))
+    results_w.mainloop()
+
+            ### Windows
+test=Frame(master,width=400,height=0)
+game_w = Canvas(master, width=400, height=300)
+
+            ### Bindings
+test.bind('<KeyPress>',type_log)
+test.bind('<Return>',enter_word)
+test.bind('<Left>',test)
+test.pack()
+test.focus_set()
+game_w.pack()
+
+            ### Variables
+handle=open('5-letter-words.txt')
+target_word_list=[]
+word=''
+score=0
+start=time.time()
+for line in handle:
+    words=line.split()
+    target_word_list+=words
+word_id=game_w.create_text(200,295,text='Type the word in the bubble',fill='#000000')
+score_id=game_w.create_text(350,295,text='Score: '+str(score))
+time_id=game_w.create_text(50,295,text='Time left: '+'60')
+game_w.create_line(0,285,400,285)
+time_left=60
+
+            ### Call Intializing Functions
+gen_target()                          
+gen_balloon()
 
 
-test.mainloop()
+
+
+
+
+mainloop()
+
