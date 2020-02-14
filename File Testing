@@ -1,0 +1,50 @@
+#Trial Two
+from tkinter import *
+import random
+import time
+
+master=Tk()
+master.title('Login')
+
+class user:
+    def __init__(self,username,password):
+        self.username=username
+        self.password=password
+
+def add_user():
+    global user
+    global password
+    name=user.get()
+    do=1
+    passcode=password.get()
+    accounts=open('accounts.txt','a+')
+    for line in accounts:
+        line=line.split()
+        print(line)
+        if line[0]==name and line[1]!=passcode:
+            print('Invalid Login')
+            break
+        elif line[0]==name and line[1]==passcode:
+            do=0
+    do=0
+    if do==1:
+        accounts.write(name+' '+passcode+' \n')
+    accounts.close()
+    accounts=open('accounts.txt',"r+")
+    print(accounts.readlines())
+
+
+test=Frame(master,width=200,height=200)
+Window=Canvas(master,width=200,height=200)
+user = Entry(master, text="User name:")
+username_id=Label(master,text='Username: ')
+username_id.grid(row=1,column=1)
+user.grid(row=1,column=2)
+password = Entry(master, text="Password:",show="*")
+password.grid(row=2,column=2)
+password_id=Label(master,text='Password: ')
+password_id.grid(row=2,column=1)
+test.bind('<Return>',add_user)
+submit=Button(master,command=add_user)
+submit.grid(row=3,column=1)
+test.mainloop()
