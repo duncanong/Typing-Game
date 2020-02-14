@@ -1,4 +1,5 @@
 #Trial One
+
 from tkinter import *
 import random
 import time
@@ -6,6 +7,9 @@ import time
 master = Tk()
 master.title('Balloon Pop')
 
+            ### Windows
+test=Frame(master,width=400,height=0)
+game_w = Canvas(master, width=400, height=300)
 
             ### Functions
 class user:
@@ -22,15 +26,15 @@ def type_log(e):
     letter=e.char
     word+=letter
     now=time.time()
-    time_left=int(60-((now-start)//1))
-    if now-start<60:
+    time_left=int(180-((now-start)//1))
+    if now-start<10:
         if e.keysym=='BackSpace':
             word=word[:-2]
         game_w.itemconfig(word_id,text=word)
         game_w.itemconfig(time_id,text='Time left: '+str(time_left))
     else:
-        game_w.destroy()
-        test.destroy()
+        game_w.delete("all")
+        game_w.update()
         show_results()
 
 def enter_word(e):
@@ -39,6 +43,7 @@ def enter_word(e):
     global word_id
     global target_id
     global balloon
+    global string
     global score
     global score_id
     if word==target:
@@ -46,25 +51,25 @@ def enter_word(e):
         gen_target()
         game_w.itemconfig(target_id, text=target)
         game_w.delete(balloon)
+        game_w.delete(string)
         game_w.delete(target_id)
         score+=1
         game_w.itemconfig(score_id,text='Score: '+str(score))
         gen_balloon()
         word=''
-#    else:
-#        game_w.itemconfig(word_id,text='Failure')
-        
-def test():
-    global target_id
-    print(target_id.x)
 
 def gen_balloon():
     global balloon
+    global string
     global target
     global target_id
     x1=random.randint(0,300)
     y1=random.randint(0,180)
     balloon=game_w.create_oval(x1,y1,x1+100,y1+100,fill='#8b0000')
+    if y1+150<285:
+        string=game_w.create_line(x1+50,y1+100,x1+50,y1+150)
+    elif y1+150>=285:
+        string=game_w.create_line(x1+50,y1+100,x1+50,285)
     target_id=game_w.create_text(x1+50,y1+50,text=target,fill='#008b00')
     
 def gen_target():
@@ -74,18 +79,15 @@ def gen_target():
 
 def show_results():
     global score
-    results_w=Canvas(master,width=200,height=200)
-    results_w.create_text(100,100,text='Your score is '+str(score))
-    results_w.mainloop()
+    global master
+    global game_w
+    game_w.create_text(200,150,text='Your score is '+str(score))
+    game_w.update()
 
-            ### Windows
-test=Frame(master,width=400,height=0)
-game_w = Canvas(master, width=400, height=300)
-
+    
             ### Bindings
 test.bind('<KeyPress>',type_log)
 test.bind('<Return>',enter_word)
-test.bind('<Left>',test)
 test.pack()
 test.focus_set()
 game_w.pack()
@@ -95,15 +97,16 @@ handle=open('5-letter-words.txt')
 target_word_list=[]
 word=''
 score=0
+time_left=180
 start=time.time()
 for line in handle:
     words=line.split()
     target_word_list+=words
-word_id=game_w.create_text(200,295,text='Type the word in the bubble',fill='#000000')
+word_id=game_w.create_text(200,295,text='Type the word in the balloon',fill='#000000')
 score_id=game_w.create_text(350,295,text='Score: '+str(score))
-time_id=game_w.create_text(50,295,text='Time left: '+'60')
+time_id=game_w.create_text(50,295,text='Time left: '+str(time_left))
 game_w.create_line(0,285,400,285)
-time_left=60
+
 
             ### Call Intializing Functions
 gen_target()                          
@@ -115,4 +118,3 @@ gen_balloon()
 
 
 mainloop()
-
