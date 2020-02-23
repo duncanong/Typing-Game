@@ -1,4 +1,4 @@
-#Trial Two
+#Trial One
 
 from tkinter import *
 import random
@@ -81,23 +81,27 @@ def gen_target():
     target=target_word_list[random.randint(0,3723)]
 
 def add_user():
-    global user
-    global password
-    name=user.get()
-    do=1
-    passcode=password.get()
+    global enter_username
+    global enter_password
+    name=enter_username.get()
+    print(name+"_h=open("+chr(34)+name+".txt"+chr(34)+", "+chr(34)+"a+"+chr(34)+")")
+    known_users=()
+    password=enter_password.get()
     accounts=open('accounts.txt','a+')
     for line in accounts:
-        line=line.split()
-        print(line)
-        if line[0]==name and line[1]!=passcode:
-            print('Invalid Login')
-            break
-        elif line[0]==name and line[1]==passcode:
-            do=0
-    do=0
-    if do==1:
-        accounts.write(name+' '+passcode+' \n')
+        lines=line.split()
+        known_users+=lines
+    print(known_users)
+    if name not in known_users:
+        accounts.write(name+' '+password+' \n')
+        start_screen()
+    elif name not in known_users and password in known_users:
+        print('Password Already Taken')
+        user.delete(0, 'end')
+    elif name in known_users and password not in known_users:
+        print('Error')
+    elif name+' '+password in known_users:
+        start_screen()
     accounts.close()
     accounts=open('accounts.txt',"r+")
     print(accounts.readlines())
@@ -105,14 +109,16 @@ def add_user():
 #   --------------------Screens---------------------    #
 
 def login_screen():
-    global enter_username_id
-    global enter_password_id
+    global enter_username
+    global enter_password
     global login_id
     enter_username=Entry(master)
     enter_username_id=game_w.create_window(200,100,window=enter_username)
+    user_name_id=game_w.create_text(100,100,text='Username')
     enter_password=Entry(master,show='*')
     enter_password_id=game_w.create_window(200,125,window=enter_password)
-    login=Button(master,text='Login',font='bold 12',command=start_screen)
+    pass_word_id=game_w.create_text(100,125,text='Password')
+    login=Button(master,text='Login',font='bold 12',command=add_user)
     login_id=game_w.create_window(200,150,window=login)
     game_w.update()
     
@@ -122,9 +128,7 @@ def start_screen():
     global enter_username_id
     global enter_password_id
     global login_id
-    game_w.delete(enter_username_id)
-    game_w.delete(enter_password_id)
-    game_w.delete(login_id)
+    game_w.delete('all')
     background_circle=game_w.create_oval(50,25,350,275,fill='Purple')
     choose_start=Button(master,text='Start Game',font='bold 30',command=start_game)
     choose_start_id=game_w.create_window(200,150,window=choose_start)
@@ -174,12 +178,19 @@ def show_results():
     global score
     global master
     global game_w
+    test.unbind('<KeyPress>')
+    test.unbind('<Return>')
     game_w.create_text(200,150,text='Your score is '+str(score),font='bold')
     game_w.create_polygon(60, 140, 90, 140, 100, 110, 110, 140, 140, 140, 115, 160, 125, 190, 100, 170, 75, 190, 85, 160,fill='yellow')
     game_w.create_polygon(260, 140, 290, 140, 300, 110, 310, 140, 340, 140, 315, 160, 325, 190, 300, 170, 275, 190, 285, 160,fill='yellow')
-    show_history=Button(master,text='Show Scores',command=destroy())
+    show_history=Button(master,text='Show Scores',command=scores_screen)
     game_w.create_window(200,175,window=show_history)
     game_w.update()
+
+def scores_screen():
+    global name
+    exec(name+"_h=open("+chr(34)+name+".txt"+chr(34)+", "+chr(34)+"a+"+chr(34)+")") 
+
 
 test.pack()
 test.focus_set()
@@ -187,3 +198,4 @@ game_w.pack()
 login_screen()
 
 mainloop()
+
