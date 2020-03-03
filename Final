@@ -1,0 +1,308 @@
+                #Trial One
+
+from tkinter import *
+import random
+import time
+
+master = Tk()
+master.title('Balloon Pop')
+
+            ### Windows
+test=Frame(master,width=1500,height=0)
+game_w = Canvas(master, width=1700, height=800,bg='#1F618D')
+
+            ### Functions
+class user:
+    def __init__(self,username,password):
+        self.username=username
+        self.password=password
+
+def destroy():
+    print('hello world')
+
+def type_log(e):
+    global target
+    global word
+    global word_id
+    global start
+    global time_left
+    letter=e.char
+    word+=letter
+    if mode=='normal':
+        now=time.time()
+        time_left=int(180-((now-start)//1))
+        if now-start<180:
+            if e.keysym=='BackSpace':
+                word=word[:-2]
+            game_w.itemconfig(word_id,text=word)
+            game_w.itemconfig(time_id,text='Time left: '+str(time_left))
+        else:
+            game_w.delete("all")
+            game_w.update()
+            show_results()
+    elif mode=='practice':
+        if e.keysym=='BackSpace':
+            word=word[:-2]
+        game_w.itemconfig(word_id,text=word)
+
+def enter_word(e):
+    global target
+    global word
+    global word_id
+    global target_id
+    global balloon
+    global string
+    global score
+    global score_id
+    if word==target:
+        game_w.itemconfig(word_id,text='Correct!')
+        game_w.itemconfig(target_id, text=target)
+        game_w.delete(balloon)
+        game_w.delete(string)
+        game_w.delete(target_id)
+        score+=1
+        game_w.itemconfig(score_id,text='Score: '+str(score))
+        gen_balloon()
+        word=''      
+        
+def gen_balloon():
+    global balloon
+    global string
+    global target
+    global target_word_list
+    global target_id
+    x1=random.randint(0,1600)
+    y1=random.randint(50,640)
+    target=target_word_list[random.randint(0,3723)]
+    balloon=game_w.create_oval(x1,y1,x1+100,y1+100,fill='#8b0000')
+    if y1+150<750:
+        string=game_w.create_line(x1+50,y1+100,x1+50,y1+150)
+    elif y1+150>=750:
+        string=game_w.create_line(x1+50,y1+100,x1+50,750)
+    target_id=game_w.create_text(x1+50,y1+50,text=target,font='bold 16',fill='#008b00')
+    
+def add_user():
+    global enter_username
+    global enter_password
+    global name
+    name=enter_username.get()
+    known_users=[]
+    password=enter_password.get()
+    accounts=open('accounts.txt','r')
+    for line in accounts:
+        lines=line.split()
+        known_users+=lines
+    accounts.close()
+    accounts=open('accounts.txt','a+')
+    if name not in known_users:
+        accounts.write(name+' '+password+' \n')
+        mode_selection_screen()
+    elif name in known_users and password not in known_users:
+        enter_password.delete(0,'end')
+        game_w.create_text(850,533.33,text="Incorrect Password",font="bold 16")
+    elif name and password in known_users:
+        mode_selection_screen()
+    accounts.close()
+
+#   --------------------Screens---------------------    #
+
+def login_screen():
+    global enter_username
+    global enter_password
+    global login_id
+    game_w.delete('all')
+    test.bind('<Return>',add_user)
+    test.focus_set()
+    game_w.create_text(850,200,text='Welcome to Balloon Pop!',font='bold 24')
+    game_w.create_oval(275,225,375,325,fill='#8b0000')
+    game_w.create_oval(200,75,300,175,fill='#8b0000')
+    game_w.create_text(250,125,text='Apple',font='16')
+    game_w.create_oval(450,150,550,250,fill='#8b0000')
+    game_w.create_oval(175,400,275,500,fill='#8b0000')
+    game_w.create_text(225,450,text='Smile',font='16')
+    game_w.create_oval(350,350,450,450,fill='#8b0000')
+    game_w.create_text(400,400,text='Cored',font='16')
+    game_w.create_oval(265,600,365,700,fill='#8b0000')
+    game_w.create_line(325,325,325,375)
+    game_w.create_line(250,175,250,225)
+    game_w.create_line(500,250,500,300)
+    game_w.create_line(225,500,225,550)
+    game_w.create_line(400,450,400,500)
+    game_w.create_line(315,700,315,750)
+    game_w.create_oval(1250,275,1350,375,fill='#8b0000')
+    game_w.create_oval(1325,75,1425,175,fill='#8b0000')
+    game_w.create_oval(1150,150,1250,250,fill='#8b0000')
+    game_w.create_oval(1425,375,1525,475,fill='#8b0000')
+    game_w.create_oval(1050,525,1150,625,fill='#8b0000')
+    game_w.create_oval(1300,575,1400,675,fill='#8b0000')
+    game_w.create_line(1300,375,1300,425)
+    game_w.create_line(1375,175,1375,225)
+    game_w.create_line(1200,250,1200,300)
+    game_w.create_line(1475,475,1475,525)
+    game_w.create_line(1100,625,1100,675)
+    game_w.create_line(1350,675,1350,725)
+    game_w.create_text(1100,5750,text='Happy',font='16')
+    game_w.create_text(1375,1250,text='Blues',font='16')
+    enter_username=Entry(master)
+    enter_username_id=game_w.create_window(850,300,window=enter_username)
+    user_name_id=game_w.create_text(725,300,text='Username',font='16')
+    enter_password=Entry(master,show='*')
+    enter_password_id=game_w.create_window(850,350,window=enter_password)
+    pass_word_id=game_w.create_text(725,350,text='Password',font='16')
+    login=Button(master,text='Login',font='bold 12',command=add_user)
+    login_id=game_w.create_window(850,400,window=login)
+    game_w.update()
+
+def mode_selection_screen():
+    global logout
+    game_w.delete('all')
+    logout=Button(master,text="Logout",font='16',command=login_screen)
+    exec(name+"_label_id=game_w.create_text(850,100,text="+chr(34)+"User: "+name+chr(34)+',font='+chr(34)+"24"+chr(34)+")")
+    game_w.create_window(50,25,window=logout)
+    game_w.create_rectangle(200,150,1500,650,fill='green')
+    tutorial=Button(master,text='Tutorial',font='20',command=tutorial_screen)
+    game_w.create_window(850,300,window=tutorial)
+    practice=Button(master,text='Practice Typing',font='20', command=practice_screen)
+    game_w.create_window(850,400,window=practice)
+    normal=Button(master, text='Normal Gameplay',font='20',command=start_screen)
+    game_w.create_window(850,500,window=normal)
+    game_w.update()
+
+def tutorial_screen():
+    global back
+    game_w.delete('all')
+    game_w.create_window(50,25,window=logout)
+    back=Button(master,text='Return to Selection Screen',font='16',command=mode_selection_screen)
+    game_w.create_window(850,25,window=back)
+    game_w.create_image(500,400,image=img1)
+    game_w.create_image(1200,400,image=img2)
+    game_w.update()
+
+def practice_screen():
+    global back
+    global word
+    global mode
+    global word_id
+    game_w.delete('all')
+    mode='practice'
+    back=Button(master,text='Return to Selection Screen',font='16',command=mode_selection_screen)
+    game_w.create_window(50,25,window=logout)
+    game_w.create_window(850,25,window=back)
+    test.bind('<KeyPress>',type_log)
+    word=''
+    word_id=game_w.create_text(850,775,text='Type Any Character',font='24')
+    test.focus_set()
+    game_w.update()
+    
+def start_screen():
+    global choose_start_id
+    global background_circle
+    global enter_username_id
+    global enter_password_id
+    global login_id
+    global logout
+    test.unbind('<Return>')
+    test.focus_set()
+    game_w.delete('all')
+    game_w.create_window(50,25,window=logout)
+    back=Button(master,text='Return to Selection Screen',font='16',command=mode_selection_screen)
+    game_w.create_window(200,25,window=back)
+    background_circle=game_w.create_oval(200,100,1500,700,fill='Purple')
+    choose_start=Button(master,text='Start Game',font='bold 30',command=start_game)
+    choose_start_id=game_w.create_window(850,400,window=choose_start)
+    game_w.update()
+
+def start_game():
+    global word
+    global time_left
+    global start
+    global word_id
+    global score_id
+    global target_word_list
+    global time_id
+    global score
+    global choose_start_id
+    global background_circle
+    global mode
+    game_w.delete(choose_start_id)
+    game_w.delete(background_circle)
+    
+            ### Bindings
+    test.bind('<KeyPress>',type_log)
+    test.bind('<Return>',enter_word)
+    test.focus_set()
+
+            ### Variables
+    handle=open('5-letter-words.txt')
+    target_word_list=[]
+    for line in handle:
+            words=line.split()
+            target_word_list+=words
+    mode='normal'
+    word=''
+    score=0
+    time_left=180
+    start=time.time()
+
+    exec(name+"_label_id=game_w.create_text(850,25,text="+chr(34)+"User: "+name+chr(34)+")")
+    game_w.create_window(50,25,window=logout)
+    word_id=game_w.create_text(850,775,text='Type the word in the balloon',fill='#000000',font='16')
+    score_id=game_w.create_text(1600,775,text='Score: '+str(score),font='16')
+    time_id=game_w.create_text(100,775,text='Time left: '+str(time_left),font='16')
+    game_w.create_line(0,750,1700,750)
+    game_w.create_line(0,50,1700,50)
+
+
+            ### Call Intializing Functions                         
+    gen_balloon()
+    game_w.update()
+
+def show_results():
+    global score
+    global master
+    global game_w
+    global name
+    global show_history
+    global play_again_button
+    test.unbind('<KeyPress>')
+    test.unbind('<Return>')
+    score_id=str(score)
+    exec(name+"_h=open("+chr(34)+name+"_scores.txt"+chr(34)+", "+chr(34)+"a+"+chr(34)+")")
+    eval(name+'_h.write(score_id+'+chr(34)+" "+chr(34)+"+str(score//3)+"+chr(34)+" "+chr(34)+")")
+    eval(name+'_h.close()')
+    game_w.create_window(50,25,window=logout)
+    scores_label_id=game_w.create_text(850,350,text='Your score is '+str(score),font='bold')
+    star1=game_w.create_polygon(290, 350, 410, 350, 450, 230, 490, 350, 610, 350, 510, 430, 550, 550, 450, 470, 350, 550, 390, 430,fill='yellow')
+    star2=game_w.create_polygon(1090, 350, 1210, 350, 1250, 230, 1290, 350, 1410, 350, 1310, 430, 1350, 550, 1250, 470, 1150, 550, 1190, 430,fill='yellow')
+    play_again_button=Button(master,text='Play Again',font='20', command=start_screen)
+    play_again_id=game_w.create_window(850,400,window=play_again_button)
+    show_history=Button(master,text='Show Scores',font='20',command=scores_screen)
+    show_history_id=game_w.create_window(850,450,window=show_history)
+    game_w.update()
+
+def scores_screen():
+    global name
+    game_w.delete('all')
+    play_again_id=game_w.create_window(850,25,window=play_again_button)
+    exec(name+"_h=open("+chr(34)+name+"_scores.txt"+chr(34)+", "+chr(34)+"r"+chr(34)+")")
+    y2=200
+    game_w.create_window(50,25,window=logout)
+    game_w.create_text(800,150,text='Scores',font='20')
+    game_w.create_text(900,150,text='Words per Minute',font='20')
+    for line in eval(name+"_h"):
+        lines=line.split()
+        game_number=1
+        for i in range(len(lines)//2):
+            game_w.create_text(800,y2,text=lines[game_number-1],font='16')
+            game_w.create_text(900,y2,text=lines[game_number],font='16')
+            game_number+=2
+            y2+=40
+    eval(name+"_h.close()")
+    game_w.update()
+
+img1=PhotoImage(file='Test_keyboard.gif')
+img2=PhotoImage(file='Keyboard_2.gif')
+test.pack()
+game_w.pack()
+login_screen()
+mainloop()
