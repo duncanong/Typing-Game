@@ -17,8 +17,20 @@ class user:
         self.username=username
         self.password=password
 
-def destroy():
-    print('hello world')
+def set_time_1():
+    global set_time
+    set_time=30
+    start_screen()
+
+def set_time_2():
+    global set_time
+    set_time=60
+    start_screen()
+
+def set_time_3():
+    global set_time
+    set_time=180
+    start_screen()
 
 def type_log(e):
     global target
@@ -30,8 +42,8 @@ def type_log(e):
     word+=letter
     if mode=='normal':
         now=time.time()
-        time_left=int(180-((now-start)//1))
-        if now-start<180:
+        time_left=int(set_time-((now-start)//1))
+        if now-start<=set_time:
             if e.keysym=='BackSpace':
                 word=word[:-2]
             game_w.itemconfig(word_id,text=word)
@@ -44,6 +56,7 @@ def type_log(e):
         if e.keysym=='BackSpace':
             word=word[:-2]
         game_w.itemconfig(word_id,text=word)
+        game_w.update()
 
 def enter_word(e):
     global target
@@ -88,6 +101,7 @@ def add_user():
     name=enter_username.get()
     known_users=[]
     password=enter_password.get()
+    print("Password= "+password)
     accounts=open('accounts.txt','r')
     for line in accounts:
         lines=line.split()
@@ -164,7 +178,7 @@ def mode_selection_screen():
     game_w.create_window(850,300,window=tutorial)
     practice=Button(master,text='Practice Typing',font='20', command=practice_screen)
     game_w.create_window(850,400,window=practice)
-    normal=Button(master, text='Normal Gameplay',font='20',command=start_screen)
+    normal=Button(master, text='Normal Gameplay',font='20',command=time_selection)
     game_w.create_window(850,500,window=normal)
     game_w.update()
 
@@ -193,7 +207,24 @@ def practice_screen():
     word_id=game_w.create_text(850,775,text='Type Any Character',font='24')
     test.focus_set()
     game_w.update()
-    
+
+def time_selection():
+    global set_time
+    global back
+    game_w.delete('all')
+    back=Button(master,text='Return to Selection Screen',font='16',command=mode_selection_screen)
+    game_w.create_window(50,25,window=logout)
+    game_w.create_window(200,25,window=back)
+    background_circle=game_w.create_oval(200,100,1500,700,fill='Purple')
+    time1=Button(master,text='30 Seconds',font='16',command=set_time_1)
+    time2=Button(master,text='1 Minute',font='16',command=set_time_2)
+    time3=Button(master,text='3 Minutes',font='16',command=set_time_3)
+    game_w.create_window(850,350,window=time1)
+    game_w.create_window(850,400,window=time2)
+    game_w.create_window(850,450,window=time3)
+    game_w.create_text(850,250,text='Select Preferred Time Limit',font='24')
+    game_w.update()
+
 def start_screen():
     global choose_start_id
     global background_circle
@@ -241,7 +272,7 @@ def start_game():
     mode='normal'
     word=''
     score=0
-    time_left=180
+    time_left=set_time
     start=time.time()
 
     exec(name+"_label_id=game_w.create_text(850,25,text="+chr(34)+"User: "+name+chr(34)+")")
@@ -268,7 +299,7 @@ def show_results():
     test.unbind('<Return>')
     score_id=str(score)
     exec(name+"_h=open("+chr(34)+name+"_scores.txt"+chr(34)+", "+chr(34)+"a+"+chr(34)+")")
-    eval(name+'_h.write(score_id+'+chr(34)+" "+chr(34)+"+str(score//3)+"+chr(34)+" "+chr(34)+")")
+    eval(name+'_h.write(score_id+'+chr(34)+" "+chr(34)+"+str(int(score//(set_time/60)))+"+chr(34)+" "+chr(34)+")")
     eval(name+'_h.close()')
     game_w.create_window(50,25,window=logout)
     scores_label_id=game_w.create_text(850,350,text='Your score is '+str(score),font='bold')
@@ -291,11 +322,11 @@ def scores_screen():
     game_w.create_text(900,150,text='Words per Minute',font='20')
     for line in eval(name+"_h"):
         lines=line.split()
-        game_number=1
+        game_number=len(lines)-1
         for i in range(len(lines)//2):
             game_w.create_text(800,y2,text=lines[game_number-1],font='16')
             game_w.create_text(900,y2,text=lines[game_number],font='16')
-            game_number+=2
+            game_number-=2
             y2+=40
     eval(name+"_h.close()")
     game_w.update()
@@ -306,3 +337,4 @@ test.pack()
 game_w.pack()
 login_screen()
 mainloop()
+
